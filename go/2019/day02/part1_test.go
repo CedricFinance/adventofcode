@@ -1,16 +1,17 @@
 package day02
 
 import (
+	"github.com/CedricFinance/adventofcode/2019/lib"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func Test_part1(t *testing.T) {
-	program := readProgram()
-	program[1] = 12
-	program[2] = 2
+	program := lib.ReadProgram()
+	program.Data[1] = 12
+	program.Data[2] = 2
 
-	run(program)
+	program.Run(0)
 
-	assert.Equal(t, 2842648, program[0])
+	assert.Equal(t, 2842648, program.Data[0])
 }

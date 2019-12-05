@@ -1,4 +1,4 @@
-package day02
+package day05
 
 import (
 	"github.com/CedricFinance/adventofcode/2019/lib"
@@ -8,9 +8,6 @@ import (
 
 func Test_part2(t *testing.T) {
 	program := lib.ReadProgram()
-
-	noun, verb := FindOutput(program, 19690720)
-
-	assert.Equal(t, 90, noun)
-	assert.Equal(t, 74, verb)
+	program.Run(5)
+	assert.Equal(t, 15724522, program.Output)
 }

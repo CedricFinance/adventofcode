@@ -8,7 +8,7 @@ import (
 )
 
 type Program struct {
-	data   []int
+	Data   []int
 	Output int
 }
 
@@ -24,13 +24,13 @@ func ReadProgram() *Program {
 		decodedProgram[i] = int(num)
 	}
 	return &Program{
-		data:   decodedProgram,
+		Data:   decodedProgram,
 		Output: 0,
 	}
 }
 
 func (p *Program) Decode(pc int) Instruction {
-	opcode := p.data[pc]
+	opcode := p.Data[pc]
 	immediateParameters := make(map[int]bool)
 
 	if opcode > 99 {
@@ -51,35 +51,69 @@ func (p *Program) Decode(pc int) Instruction {
 	return Instruction{
 		opcode:              operation,
 		immediateParameters: immediateParameters,
-		parameters:          p.data[pc+1 : pc+1+op.Length-1],
+		parameters:          p.Data[pc+1 : pc+1+op.Length-1],
 		Length:              op.Length,
 	}
 }
 
 func (p *Program) Run(input int) {
 	pc := 0
-	for p.data[pc] != 99 {
+	for p.Data[pc] != 99 {
 		instruction := p.Decode(pc)
 
 		if instruction.opcode == 1 {
-			left := instruction.getParameter(0, p.data)
-			right := instruction.getParameter(1, p.data)
-			dest := p.data[pc+3]
-			p.data[dest] = left + right
+			left := instruction.getParameter(0, p.Data)
+			right := instruction.getParameter(1, p.Data)
+			dest := p.Data[pc+3]
+			p.Data[dest] = left + right
 			pc += instruction.Length
 		} else if instruction.opcode == 2 {
-			left := instruction.getParameter(0, p.data)
-			right := instruction.getParameter(1, p.data)
-			dest := p.data[pc+3]
-			p.data[dest] = left * right
+			left := instruction.getParameter(0, p.Data)
+			right := instruction.getParameter(1, p.Data)
+			dest := p.Data[pc+3]
+			p.Data[dest] = left * right
 			pc += instruction.Length
 		} else if instruction.opcode == 3 {
-			dest := p.data[pc+1]
-			p.data[dest] = input
+			dest := p.Data[pc+1]
+			p.Data[dest] = input
 			pc += instruction.Length
 		} else if instruction.opcode == 4 {
-			fmt.Printf("%d\n", instruction.getParameter(0, p.data))
-			p.Output = instruction.getParameter(0, p.data)
+			fmt.Printf("%d\n", instruction.getParameter(0, p.Data))
+			p.Output = instruction.getParameter(0, p.Data)
+			pc += instruction.Length
+		} else if instruction.opcode == 5 {
+			test := instruction.getParameter(0, p.Data)
+			if test != 0 {
+				pc = int(instruction.getParameter(1, p.Data))
+			} else {
+				pc += instruction.Length
+			}
+		} else if instruction.opcode == 6 {
+			test := instruction.getParameter(0, p.Data)
+			if test == 0 {
+				pc = int(instruction.getParameter(1, p.Data))
+			} else {
+				pc += instruction.Length
+			}
+		} else if instruction.opcode == 7 {
+			first := instruction.getParameter(0, p.Data)
+			second := instruction.getParameter(1, p.Data)
+			result := 0
+			if first < second {
+				result = 1
+			}
+			dest := p.Data[pc+3]
+			p.Data[dest] = result
+			pc += instruction.Length
+		} else if instruction.opcode == 8 {
+			first := instruction.getParameter(0, p.Data)
+			second := instruction.getParameter(1, p.Data)
+			result := 0
+			if first == second {
+				result = 1
+			}
+			dest := p.Data[pc+3]
+			p.Data[dest] = result
 			pc += instruction.Length
 		} else {
 			panic(fmt.Errorf("unknown opcode %d", instruction.opcode))
@@ -97,6 +131,10 @@ var opcodes = map[int]Opcode{
 	2:  {Length: 4},
 	3:  {Length: 2},
 	4:  {Length: 2},
+	5:  {Length: 3},
+	6:  {Length: 3},
+	7:  {Length: 4},
+	8:  {Length: 4},
 	99: {Length: 1},
 }
 
