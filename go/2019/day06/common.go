@@ -24,6 +24,33 @@ func (o Orbits) Count() interface{} {
 	return totalOrbits
 }
 
+func orbitsDistances(obj *Object) map[string]int {
+	result := make(map[string]int)
+	distance := 0
+	for obj.OrbitAround != nil {
+		obj = obj.OrbitAround
+		result[obj.Name] = distance
+		distance++
+	}
+	return result
+}
+
+func (o Orbits) Distance(me *Object, santa *Object) int {
+	santaOrbits := orbitsDistances(santa)
+
+	commonObj := me.OrbitAround
+	distance := 0
+	for true {
+		if _, ok := santaOrbits[commonObj.Name]; ok {
+			break
+		}
+		distance++
+		commonObj = commonObj.OrbitAround
+	}
+
+	return santaOrbits[commonObj.Name] + distance
+}
+
 func readOrbits(file string) Orbits {
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
