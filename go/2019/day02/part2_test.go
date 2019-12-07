@@ -7,7 +7,7 @@ import (
 )
 
 func Test_part2(t *testing.T) {
-	program := lib.ReadProgram()
+	program := lib.ReadProgram("input.txt")
 
 	noun, verb := FindOutput(program, 19690720)
 

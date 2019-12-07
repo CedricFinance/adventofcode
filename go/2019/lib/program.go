@@ -12,8 +12,8 @@ type Program struct {
 	Output int
 }
 
-func ReadProgram() *Program {
-	data, err := ioutil.ReadFile("input.txt")
+func ReadProgram(filename string) *Program {
+	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
@@ -56,8 +56,9 @@ func (p *Program) Decode(pc int) Instruction {
 	}
 }
 
-func (p *Program) Run(input int) {
+func (p *Program) Run(inputs ...int) {
 	pc := 0
+	currentInput := 0
 	for p.Data[pc] != 99 {
 		instruction := p.Decode(pc)
 
@@ -75,7 +76,8 @@ func (p *Program) Run(input int) {
 			pc += instruction.Length
 		} else if instruction.opcode == 3 {
 			dest := p.Data[pc+1]
-			p.Data[dest] = input
+			p.Data[dest] = inputs[currentInput]
+			currentInput++
 			pc += instruction.Length
 		} else if instruction.opcode == 4 {
 			fmt.Printf("%d\n", instruction.getParameter(0, p.Data))

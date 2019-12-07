@@ -7,7 +7,7 @@ import (
 )
 
 func Test_part1(t *testing.T) {
-	program := lib.ReadProgram()
+	program := lib.ReadProgram("input.txt")
 	program.Data[1] = 12
 	program.Data[2] = 2
 

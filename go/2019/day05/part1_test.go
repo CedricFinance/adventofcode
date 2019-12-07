@@ -7,7 +7,7 @@ import (
 )
 
 func Test_part1(t *testing.T) {
-	program := lib.ReadProgram()
+	program := lib.ReadProgram("input.txt")
 	program.Run(1)
 	assert.Equal(t, 7286649, program.Output)
 }
