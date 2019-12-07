@@ -8,6 +8,10 @@ import (
 
 func Test_part2(t *testing.T) {
 	program := lib.ReadProgram("input.txt")
-	program.Run(5)
-	assert.Equal(t, 15724522, program.Output)
+	go program.Run()
+	program.Input <- 5
+
+	output := GetDiagnosticCode(program)
+
+	assert.Equal(t, 15724522, output)
 }

@@ -11,7 +11,7 @@ func Test_part1(t *testing.T) {
 	program.Data[1] = 12
 	program.Data[2] = 2
 
-	program.Run(0)
+	program.Run()
 
 	assert.Equal(t, 2842648, program.Data[0])
 }

@@ -8,8 +8,21 @@ import (
 )
 
 type Program struct {
+	Name   string
 	Data   []int
-	Output int
+	Input  chan int
+	Output chan int
+	Exited chan bool
+}
+
+func NewProgram(name string, programMemory []int, input, output chan int) *Program {
+	return &Program{
+		Name:   name,
+		Data:   programMemory,
+		Input:  input,
+		Output: output,
+		Exited: make(chan bool, 1),
+	}
 }
 
 func ReadProgram(filename string) *Program {
@@ -23,10 +36,7 @@ func ReadProgram(filename string) *Program {
 		num, _ := strconv.ParseInt(str, 10, 32)
 		decodedProgram[i] = int(num)
 	}
-	return &Program{
-		Data:   decodedProgram,
-		Output: 0,
-	}
+	return NewProgram("program", decodedProgram, make(chan int), make(chan int))
 }
 
 func (p *Program) Decode(pc int) Instruction {
@@ -45,7 +55,7 @@ func (p *Program) Decode(pc int) Instruction {
 	op, ok := opcodes[operation]
 
 	if !ok {
-		panic(fmt.Errorf("unknown opcode %d\n", operation))
+		panic(fmt.Errorf("unknown opcode %d at %d\n", operation, pc))
 	}
 
 	return Instruction{
@@ -56,9 +66,8 @@ func (p *Program) Decode(pc int) Instruction {
 	}
 }
 
-func (p *Program) Run(inputs ...int) {
+func (p *Program) Run() {
 	pc := 0
-	currentInput := 0
 	for p.Data[pc] != 99 {
 		instruction := p.Decode(pc)
 
@@ -76,12 +85,10 @@ func (p *Program) Run(inputs ...int) {
 			pc += instruction.Length
 		} else if instruction.opcode == 3 {
 			dest := p.Data[pc+1]
-			p.Data[dest] = inputs[currentInput]
-			currentInput++
+			p.Data[dest] = <-p.Input
 			pc += instruction.Length
 		} else if instruction.opcode == 4 {
-			fmt.Printf("%d\n", instruction.getParameter(0, p.Data))
-			p.Output = instruction.getParameter(0, p.Data)
+			p.Output <- instruction.getParameter(0, p.Data)
 			pc += instruction.Length
 		} else if instruction.opcode == 5 {
 			test := instruction.getParameter(0, p.Data)
@@ -122,6 +129,8 @@ func (p *Program) Run(inputs ...int) {
 		}
 
 	}
+
+	p.Exited <- true
 }
 
 type Opcode struct {
