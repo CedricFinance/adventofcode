@@ -6,14 +6,14 @@ import (
 	"gonum.org/v1/gonum/stat/combin"
 )
 
-func FindMaxOutputWithFeedbackLoop(originalProgram *lib.Program) int {
-	var inputs [5]chan int
+func FindMaxOutputWithFeedbackLoop(originalProgram *lib.Program) int64 {
+	var inputs [5]chan int64
 	for i := range inputs {
-		inputs[i] = make(chan int, 1)
+		inputs[i] = make(chan int64, 1)
 	}
 
 	permGen := combin.NewPermutationGenerator(5, 5)
-	max := 0
+	max := int64(0)
 	for permGen.Next() {
 		phases := permGen.Permutation(nil)
 
@@ -27,14 +27,14 @@ func FindMaxOutputWithFeedbackLoop(originalProgram *lib.Program) int {
 	return max
 }
 
-func GetSignalWithFeedbackLoop(originalProgram *lib.Program, inputs [5]chan int, phases []int) int {
+func GetSignalWithFeedbackLoop(originalProgram *lib.Program, inputs [5]chan int64, phases []int) int64 {
 	var program *lib.Program
 
 	for i := 0; i < 5; i++ {
-		programMemory := make([]int, len(originalProgram.Data))
+		programMemory := make([]int64, len(originalProgram.Data))
 		copy(programMemory, originalProgram.Data)
 		program = lib.NewProgram(fmt.Sprintf("Program %d", i), programMemory, inputs[i], inputs[(i+1)%len(inputs)])
-		program.Input <- phases[i] + 5
+		program.Input <- int64(phases[i] + 5)
 		go program.Run()
 	}
 

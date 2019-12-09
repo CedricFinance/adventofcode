@@ -13,5 +13,5 @@ func Test_part1(t *testing.T) {
 
 	output := GetDiagnosticCode(program)
 
-	assert.Equal(t, 7286649, output)
+	assert.Equal(t, int64(7286649), output)
 }

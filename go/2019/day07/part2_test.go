@@ -9,11 +9,11 @@ import (
 func Test_Part2(t *testing.T) {
 	originalMemory := lib.ReadProgram("input.txt")
 
-	assert.Equal(t, 17956613, FindMaxOutputWithFeedbackLoop(originalMemory))
+	assert.Equal(t, int64(17956613), FindMaxOutputWithFeedbackLoop(originalMemory))
 }
 
 func Test_Part2_Ex1(t *testing.T) {
 	originalMemory := lib.ReadProgram("part2_ex1.txt")
 
-	assert.Equal(t, 139629729, FindMaxOutputWithFeedbackLoop(originalMemory))
+	assert.Equal(t, int64(139629729), FindMaxOutputWithFeedbackLoop(originalMemory))
 }

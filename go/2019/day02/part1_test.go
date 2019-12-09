@@ -13,5 +13,5 @@ func Test_part1(t *testing.T) {
 
 	program.Run()
 
-	assert.Equal(t, 2842648, program.Data[0])
+	assert.Equal(t, int64(2842648), program.Data[0])
 }
