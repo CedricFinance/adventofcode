@@ -9,7 +9,7 @@ import (
 func Test_part1(t *testing.T) {
 	program := lib.ReadProgramM("input.txt", 10000)
 
-	panels := PaintPanels(program)
+	panels := PaintPanels(program, Black)
 
 	assert.Equal(t, 1964, len(panels))
 }

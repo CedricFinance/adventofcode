@@ -2,11 +2,12 @@ package day11
 
 import "github.com/CedricFinance/adventofcode/2019/lib"
 
-func PaintPanels(program *lib.Program) map[lib.Point]Color {
+func PaintPanels(program *lib.Program, originColor Color) Hull {
 	go program.Run()
 
 	panels := make(map[lib.Point]Color)
 	currentPoint := lib.Point{0, 0}
+	panels[currentPoint] = originColor
 	currentHeading := Heading(UpHeading{})
 
 	running := true

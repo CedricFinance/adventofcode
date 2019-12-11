@@ -1,6 +1,8 @@
 package day11
 
-import "github.com/CedricFinance/adventofcode/2019/lib"
+import (
+	"github.com/CedricFinance/adventofcode/2019/lib"
+)
 
 type Color int8
 
