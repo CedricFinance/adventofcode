@@ -44,7 +44,7 @@ func ReadProgramM(filename string, memorySize int) *Program {
 		}
 		decodedProgram[i] = num
 	}
-	return NewProgram("program", decodedProgram, make(chan int64), make(chan int64))
+	return NewProgram("program", decodedProgram, make(chan int64, 1), make(chan int64))
 }
 
 func (p *Program) Decode(pc int) Instruction {
