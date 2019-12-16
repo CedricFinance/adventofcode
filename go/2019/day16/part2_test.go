@@ -1,0 +1,44 @@
+package day16
+
+import (
+	"github.com/stretchr/testify/assert"
+	"strconv"
+	"strings"
+	"testing"
+)
+
+func TestPart2Ex1(t *testing.T) {
+	inputStr := "03036732577212944063491565474664"
+	input := toDigits(strings.Repeat(inputStr, 10000))
+	offset, _ := strconv.ParseInt(inputStr[:7], 10, 32)
+
+	result := RunFFTOptim(input, 100, int(offset))
+	assert.Equal(t, "84462026", result)
+}
+
+func TestPart2Ex2(t *testing.T) {
+	inputStr := "02935109699940807407585447034323"
+	input := toDigits(strings.Repeat(inputStr, 10000))
+	offset, _ := strconv.ParseInt(inputStr[:7], 10, 32)
+
+	result := RunFFTOptim(input, 100, int(offset))
+	assert.Equal(t, "78725270", result)
+}
+
+func TestPart2Ex3(t *testing.T) {
+	inputStr := "03081770884921959731165446850517"
+	input := toDigits(strings.Repeat(inputStr, 10000))
+	offset, _ := strconv.ParseInt(inputStr[:7], 10, 32)
+
+	result := RunFFTOptim(input, 100, int(offset))
+	assert.Equal(t, "53553731", result)
+}
+
+func TestPart2(t *testing.T) {
+	inputStr := "59758034323742284979562302567188059299994912382665665642838883745982029056376663436508823581366924333715600017551568562558429576180672045533950505975691099771937719816036746551442321193912312169741318691856211013074397344457854784758130321667776862471401531789634126843370279186945621597012426944937230330233464053506510141241904155782847336539673866875764558260690223994721394144728780319578298145328345914839568238002359693873874318334948461885586664697152894541318898569630928429305464745641599948619110150923544454316910363268172732923554361048379061622935009089396894630658539536284162963303290768551107950942989042863293547237058600513191659935"
+	input := toDigits(strings.Repeat(inputStr, 10000))
+	offset, _ := strconv.ParseInt(inputStr[:7], 10, 32)
+
+	result := RunFFTOptim(input, 100, int(offset))
+	assert.Equal(t, "22808931", result)
+}
