@@ -9,19 +9,19 @@ import (
 
 type Program struct {
 	Name               string
-	Data               []int64
+	Data               Memory
 	Input              chan int64
 	Output             chan int64
 	Exited             chan bool
 	RelativeBaseOffset int64
 }
 
-func NewProgram(name string, programMemory []int64, input, output chan int64) *Program {
+func NewProgram(name string, mem Memory) *Program {
 	return &Program{
 		Name:   name,
-		Data:   programMemory,
-		Input:  input,
-		Output: output,
+		Data:   mem,
+		Input:  make(chan int64, 1),
+		Output: make(chan int64, 1),
 		Exited: make(chan bool, 1),
 	}
 }
@@ -31,6 +31,15 @@ func ReadProgram(filename string) *Program {
 }
 
 func ReadProgramM(filename string, memorySize int) *Program {
+	decodedProgram := ReadDataM(filename, memorySize)
+	return NewProgram("program", NewSliceMemory(decodedProgram))
+}
+
+func ReadData(filename string) []int64 {
+	return ReadDataM(filename, 0)
+}
+
+func ReadDataM(filename string, memorySize int) []int64 {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
@@ -44,11 +53,11 @@ func ReadProgramM(filename string, memorySize int) *Program {
 		}
 		decodedProgram[i] = num
 	}
-	return NewProgram("program", decodedProgram, make(chan int64, 1), make(chan int64))
+	return decodedProgram
 }
 
-func (p *Program) Decode(pc int) Instruction {
-	opcode := p.Data[pc]
+func (p *Program) Decode(pc int64) Instruction {
+	opcode := p.Data.Read(pc)
 	parametersMode := make(map[int]ParameterMode)
 
 	if opcode > 99 {
@@ -69,48 +78,48 @@ func (p *Program) Decode(pc int) Instruction {
 	return Instruction{
 		opcode:         operation,
 		parametersMode: parametersMode,
-		parameters:     p.Data[pc+1 : pc+1+op.Length-1],
+		parameters:     p.Data.Slice(pc+1, pc+1+int64(op.Length)-1),
 		Length:         op.Length,
 	}
 }
 
 func (p *Program) Run() {
-	pc := 0
-	for p.Data[pc] != 99 {
+	pc := int64(0)
+	for p.Data.Read(pc) != 99 {
 		instruction := p.Decode(pc)
 
 		if instruction.opcode == 1 {
 			left := instruction.getParameter(0, p.Data, p.RelativeBaseOffset)
 			right := instruction.getParameter(1, p.Data, p.RelativeBaseOffset)
 			dest := instruction.getParameterAddress(2, p.RelativeBaseOffset)
-			p.Data[dest] = left + right
-			pc += instruction.Length
+			p.Data.Write(dest, left+right)
+			pc += int64(instruction.Length)
 		} else if instruction.opcode == 2 {
 			left := instruction.getParameter(0, p.Data, p.RelativeBaseOffset)
 			right := instruction.getParameter(1, p.Data, p.RelativeBaseOffset)
 			dest := instruction.getParameterAddress(2, p.RelativeBaseOffset)
-			p.Data[dest] = left * right
-			pc += instruction.Length
+			p.Data.Write(dest, left*right)
+			pc += int64(instruction.Length)
 		} else if instruction.opcode == 3 {
 			dest := instruction.getParameterAddress(0, p.RelativeBaseOffset)
-			p.Data[dest] = <-p.Input
-			pc += instruction.Length
+			p.Data.Write(dest, <-p.Input)
+			pc += int64(instruction.Length)
 		} else if instruction.opcode == 4 {
 			p.Output <- instruction.getParameter(0, p.Data, p.RelativeBaseOffset)
-			pc += instruction.Length
+			pc += int64(instruction.Length)
 		} else if instruction.opcode == 5 {
 			test := instruction.getParameter(0, p.Data, p.RelativeBaseOffset)
 			if test != 0 {
-				pc = int(instruction.getParameter(1, p.Data, p.RelativeBaseOffset))
+				pc = instruction.getParameter(1, p.Data, p.RelativeBaseOffset)
 			} else {
-				pc += instruction.Length
+				pc += int64(instruction.Length)
 			}
 		} else if instruction.opcode == 6 {
 			test := instruction.getParameter(0, p.Data, p.RelativeBaseOffset)
 			if test == 0 {
-				pc = int(instruction.getParameter(1, p.Data, p.RelativeBaseOffset))
+				pc = instruction.getParameter(1, p.Data, p.RelativeBaseOffset)
 			} else {
-				pc += instruction.Length
+				pc += int64(instruction.Length)
 			}
 		} else if instruction.opcode == 7 {
 			first := instruction.getParameter(0, p.Data, p.RelativeBaseOffset)
@@ -120,8 +129,8 @@ func (p *Program) Run() {
 				result = 1
 			}
 			dest := instruction.getParameterAddress(2, p.RelativeBaseOffset)
-			p.Data[dest] = result
-			pc += instruction.Length
+			p.Data.Write(dest, result)
+			pc += int64(instruction.Length)
 		} else if instruction.opcode == 8 {
 			first := instruction.getParameter(0, p.Data, p.RelativeBaseOffset)
 			second := instruction.getParameter(1, p.Data, p.RelativeBaseOffset)
@@ -130,12 +139,12 @@ func (p *Program) Run() {
 				result = 1
 			}
 			dest := instruction.getParameterAddress(2, p.RelativeBaseOffset)
-			p.Data[dest] = result
-			pc += instruction.Length
+			p.Data.Write(dest, result)
+			pc += int64(instruction.Length)
 		} else if instruction.opcode == 9 {
 			first := instruction.getParameter(0, p.Data, p.RelativeBaseOffset)
 			p.RelativeBaseOffset = p.RelativeBaseOffset + first
-			pc += instruction.Length
+			pc += int64(instruction.Length)
 		} else {
 			panic(fmt.Errorf("unknown opcode %d", instruction.opcode))
 		}
@@ -177,14 +186,14 @@ type Instruction struct {
 	Length         int
 }
 
-func (i Instruction) getParameter(parameterIndex int, memory []int64, relativeBase int64) int64 {
+func (i Instruction) getParameter(parameterIndex int, memory Memory, relativeBase int64) int64 {
 	param := i.parameters[parameterIndex]
 	if i.parametersMode[parameterIndex] == Immediate {
 		return param
 	} else if i.parametersMode[parameterIndex] == Relative {
-		return memory[relativeBase+param]
+		return memory.Read(relativeBase + param)
 	}
-	return memory[param]
+	return memory.Read(param)
 }
 
 func (i Instruction) getParameterAddress(parameterIndex int, relativeBase int64) int64 {
