@@ -14,15 +14,17 @@ type Program struct {
 	Output             chan int64
 	Exited             chan bool
 	RelativeBaseOffset int64
+	AsyncInput         bool
 }
 
 func NewProgram(name string, mem Memory) *Program {
 	return &Program{
-		Name:   name,
-		Data:   mem,
-		Input:  make(chan int64, 1),
-		Output: make(chan int64, 1),
-		Exited: make(chan bool, 1),
+		Name:       name,
+		Data:       mem,
+		Input:      make(chan int64, 1),
+		Output:     make(chan int64, 1),
+		Exited:     make(chan bool, 1),
+		AsyncInput: false,
 	}
 }
 
@@ -102,7 +104,17 @@ func (p *Program) Run() {
 			pc += int64(instruction.Length)
 		} else if instruction.opcode == 3 {
 			dest := instruction.getParameterAddress(0, p.RelativeBaseOffset)
-			p.Data.Write(dest, <-p.Input)
+			value := int64(0)
+			if p.AsyncInput {
+				select {
+				case value = <-p.Input:
+				default:
+					value = -1
+				}
+			} else {
+				value = <-p.Input
+			}
+			p.Data.Write(dest, value)
 			pc += int64(instruction.Length)
 		} else if instruction.opcode == 4 {
 			p.Output <- instruction.getParameter(0, p.Data, p.RelativeBaseOffset)
