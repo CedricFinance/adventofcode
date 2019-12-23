@@ -31,7 +31,7 @@ func TestDealWithIncrement_Get7(t *testing.T) {
 	}
 }
 
-func Test_Part1(t *testing.T) {
+func TestPart1(t *testing.T) {
 	d := read("input.txt", 10007)
 
 	index := FindCard(d, 2019)
