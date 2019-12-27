@@ -75,6 +75,10 @@ type Object struct {
 	Position lib.Point
 }
 
+func (o *Object) String() string {
+	return fmt.Sprintf("Object{%q,%v}", o.Name, o.Position)
+}
+
 type Map struct {
 	data     []string
 	Entrance lib.Point
