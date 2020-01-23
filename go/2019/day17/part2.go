@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/CedricFinance/adventofcode/2019/lib"
 	"github.com/logrusorgru/aurora"
-	"os"
 	"time"
 )
 
@@ -17,7 +16,7 @@ func Run(program *lib.Program, display bool) int64 {
 	areaHeight := 37
 
 	if display {
-		ClearScreen()
+		lib.ClearScreen()
 	}
 
 	robot, _ := ReadCameraData2(program, cameraView, areaWidth, areaHeight, display)
@@ -38,8 +37,8 @@ func Run(program *lib.Program, display bool) int64 {
 			}
 
 			if display {
-				PrintAt(robot.Position.X, robot.Position.Y, aurora.BgBlack(" ").String())
-				PrintAt(newRobot.Position.X, newRobot.Position.Y, aurora.BgGreen(" ").String())
+				lib.PrintAt(robot.Position.X, robot.Position.Y, aurora.BgBlack(" ").String())
+				lib.PrintAt(newRobot.Position.X, newRobot.Position.Y, aurora.BgGreen(" ").String())
 				time.Sleep(5 * time.Millisecond)
 			}
 
@@ -118,81 +117,6 @@ out:
 	}
 
 	return robot, 0
-}
-
-func PrintAt(x int, y int, str string) {
-	fmt.Printf("\033[%d;%dH%s", y+1, x+1, str)
-	fmt.Print("\033[0;0H")
-}
-
-func ClearScreen() {
-	fmt.Print("\033[?25h")
-	fmt.Print("\033[2J")
-	fmt.Print("\033[0;0H")
-}
-
-func PrintView(program *lib.Program, robot *Robot, cameraView Map, areaWidth int, areaHeight int) {
-	currentX := 0
-	currentY := 0
-
-	value := <-program.Output
-
-out:
-	for {
-
-		for Tile(value) != Empty {
-			if value > 255 {
-				fmt.Printf("%d\n", value)
-				os.Exit(1)
-			} else {
-				fmt.Printf("%c", value)
-			}
-			value = <-program.Output
-		}
-
-		ClearScreen()
-
-		currentX = 0
-		currentY = 0
-
-		for IsCameraData(int(value)) || value == 10 {
-			switch Tile(value) {
-			case Empty:
-				fmt.Printf("%s", aurora.BgWhite(" "))
-			case Scaffold:
-				fmt.Printf("%s", aurora.BgBlack(" "))
-			default:
-				fmt.Printf("%c", value)
-			}
-
-			if value == 10 {
-				currentY++
-				currentX = 0
-			} else {
-				if IsRobot(int(value)) {
-					robot.Position = Point{X: currentX, Y: currentY}
-					switch value {
-					case RobotFacingEast:
-						robot.HeadingTo = East{}
-					case RobotFacingWest:
-						robot.HeadingTo = West{}
-					case RobotFacingNorth:
-						robot.HeadingTo = North{}
-					case RobotFacingSouth:
-						robot.HeadingTo = South{}
-					}
-				}
-				cameraView[Point{currentX, currentY}] = Tile(value)
-				currentX++
-			}
-
-			if currentX == areaWidth && currentY == areaHeight-1 {
-				break out
-			}
-
-			value = <-program.Output
-		}
-	}
 }
 
 func NotifyRobots(robot *Robot, m Map, program *lib.Program) {

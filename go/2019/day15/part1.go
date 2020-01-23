@@ -35,16 +35,6 @@ func GetEmptyNeighbours(positions []Point, shipMap map[Point]Tile) []Point {
 	return result
 }
 
-func PrintAt(x int, y int, str string) {
-	fmt.Printf("\033[%d;%dH%s", y+22, x+22, str)
-	fmt.Print("\033[0;0H")
-}
-
-func ClearScreen() {
-	fmt.Print("\033[2J")
-	fmt.Print("\033[0;0H")
-}
-
 func DisplayMap(m map[Point]Tile) {
 	minX := 0
 	minY := 0
@@ -67,7 +57,7 @@ func DisplayMap(m map[Point]Tile) {
 	}
 
 	fmt.Printf("map corners: (%d,%d), (%d,%d)\n", minX, minY, maxX, maxY)
-	ClearScreen()
+	lib.ClearScreen()
 
 	for y := minY; y <= maxY; y++ {
 		for x := minX; x <= maxX; x++ {

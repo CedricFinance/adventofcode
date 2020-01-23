@@ -8,12 +8,12 @@ import (
 
 func main() {
 	program := lib.ReadProgramM("input.txt", 10000)
-	program.Data[0] = 2
+	program.Data.Write(0, 2)
 
 	go program.Run()
 
 	score := day13.RunGame(program, false)
 
-	day13.ClearScreen()
+	lib.ClearScreen()
 	fmt.Printf("The final score is %d\n", score)
 }

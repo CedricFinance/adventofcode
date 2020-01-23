@@ -6,14 +6,14 @@ import (
 	"gonum.org/v1/gonum/stat/combin"
 )
 
-func FindMaxOutput(originalProgram *lib.Program) int64 {
+func FindMaxOutput(originalData []int64) int64 {
 	permGen := combin.NewPermutationGenerator(5, 5)
 	max := int64(0)
 
 	for permGen.Next() {
 		phases := permGen.Permutation(nil)
 
-		signal := GetSignal(originalProgram, phases)
+		signal := GetSignal(originalData, phases)
 
 		if signal > max {
 			max = signal
@@ -23,13 +23,14 @@ func FindMaxOutput(originalProgram *lib.Program) int64 {
 	return max
 }
 
-func GetSignal(originalProgram *lib.Program, phases []int) int64 {
+func GetSignal(originalData []int64, phases []int) int64 {
 	previousInput := int64(0)
 
 	for i := 0; i < 5; i++ {
-		programMemory := make([]int64, len(originalProgram.Data))
-		copy(programMemory, originalProgram.Data)
-		program := lib.NewProgram(fmt.Sprintf("Program %d", i), programMemory, make(chan int64), make(chan int64))
+		data := make([]int64, len(originalData))
+		copy(data, originalData)
+		mem := lib.NewSliceMemory(data)
+		program := lib.NewProgram(fmt.Sprintf("Program %d", i), mem)
 
 		go program.Run()
 

@@ -8,7 +8,7 @@ import (
 
 func TestPart1(t *testing.T) {
 	program := lib.ReadProgramM("input.txt", 10000)
-	program.Data[0] = 1
+	program.Data.Write(0, 1)
 
 	value := ComputeCalibrationValue(program)
 	assert.Equal(t, 2804, value)

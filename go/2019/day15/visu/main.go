@@ -30,14 +30,25 @@ func main() {
 
 	day15.DisplayMap(shipMap)
 
+	minX := 0
+	minY := 0
+	for pos := range shipMap {
+		if pos.X < minX {
+			minX = pos.X
+		}
+		if pos.Y < minY {
+			minY = pos.Y
+		}
+	}
+
 	time := day15.FillOxygen(*tankPosition, shipMap, func(filledPositions []day15.Point) {
 		for _, p := range filledPositions {
-			day15.PrintAt(p.X, p.Y, aurora.BgBlue(" ").String())
+			lib.PrintAt(p.X-minX, p.Y-minY, aurora.BgBlue(" ").String())
 		}
-		time2.Sleep(5 * time2.Millisecond)
+		time2.Sleep(10 * time2.Millisecond)
 	})
 
-	day15.ClearScreen()
+	lib.ClearScreen()
 
 	fmt.Printf("Ship filled with oxygen in %d minutes\n", time)
 }

@@ -7,9 +7,9 @@ import (
 )
 
 func Test_part2(t *testing.T) {
-	program := lib.ReadProgram("input.txt")
+	data := lib.ReadData("input.txt")
 
-	noun, verb := FindOutput(program, 19690720)
+	noun, verb := FindOutput(data, 19690720)
 
 	assert.Equal(t, 90, noun)
 	assert.Equal(t, 74, verb)

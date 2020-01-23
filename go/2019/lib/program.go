@@ -18,11 +18,15 @@ type Program struct {
 }
 
 func NewProgram(name string, mem Memory) *Program {
+	return NewProgramI(name, mem, make(chan int64, 1), make(chan int64, 1))
+}
+
+func NewProgramI(name string, mem Memory, input, output chan int64) *Program {
 	return &Program{
 		Name:       name,
 		Data:       mem,
-		Input:      make(chan int64, 1),
-		Output:     make(chan int64, 1),
+		Input:      input,
+		Output:     output,
 		Exited:     make(chan bool, 1),
 		AsyncInput: false,
 	}

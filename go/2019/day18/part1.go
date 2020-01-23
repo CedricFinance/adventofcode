@@ -3,11 +3,10 @@ package day18
 import (
 	"fmt"
 	"github.com/CedricFinance/adventofcode/2019/day18/dijkstra"
-	"github.com/CedricFinance/adventofcode/lib"
+	"github.com/CedricFinance/adventofcode/2019/lib"
 	"github.com/logrusorgru/aurora"
 	"github.com/willf/bitset"
 
-	//"github.com/willf/bitset"
 	"io"
 	"io/ioutil"
 	"math"

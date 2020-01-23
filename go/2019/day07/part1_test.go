@@ -7,25 +7,25 @@ import (
 )
 
 func Test_Part1_Ex1(t *testing.T) {
-	originalMemory := lib.ReadProgram("ex1.txt")
+	data := lib.ReadData("ex1.txt")
 
-	assert.Equal(t, int64(43210), FindMaxOutput(originalMemory))
+	assert.Equal(t, int64(43210), FindMaxOutput(data))
 }
 
 func Test_Part1_Ex2(t *testing.T) {
-	originalMemory := lib.ReadProgram("ex2.txt")
+	data := lib.ReadData("ex2.txt")
 
-	assert.Equal(t, int64(54321), FindMaxOutput(originalMemory))
+	assert.Equal(t, int64(54321), FindMaxOutput(data))
 }
 
 func Test_Part1_Ex3(t *testing.T) {
-	originalMemory := lib.ReadProgram("ex3.txt")
+	data := lib.ReadData("ex3.txt")
 
-	assert.Equal(t, int64(65210), FindMaxOutput(originalMemory))
+	assert.Equal(t, int64(65210), FindMaxOutput(data))
 }
 
 func Test_Part1(t *testing.T) {
-	originalMemory := lib.ReadProgram("input.txt")
+	data := lib.ReadData("input.txt")
 
-	assert.Equal(t, int64(914828), FindMaxOutput(originalMemory))
+	assert.Equal(t, int64(914828), FindMaxOutput(data))
 }

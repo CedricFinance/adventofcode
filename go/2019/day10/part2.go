@@ -8,7 +8,7 @@ import (
 func VisibleAsteroids(asteroidsPositions []lib.Point, asteroidsMap AsteroidMap, candidatePosition lib.Point) []lib.Point {
 	var visibleAsteroids []lib.Point
 	for _, asteroidPosition := range asteroidsPositions {
-		if asteroidPosition.X == candidatePosition.X && asteroidPosition.Y == candidatePosition.Y {
+		if asteroidPosition == candidatePosition {
 			continue
 		}
 		if asteroidsMap.isVisibleFrom(candidatePosition, asteroidPosition) {

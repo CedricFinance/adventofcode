@@ -7,15 +7,6 @@ import (
 	"time"
 )
 
-func PrintAt(x int, y int, str string) {
-	fmt.Printf("\033[%d;%dH%s", y+1, x+1, str)
-	fmt.Print("\033[0;0H")
-}
-
-func ClearScreen() {
-	fmt.Print("\033[2J")
-}
-
 func PrintTileAt(x int, y int, tile Tile) {
 	if x == -1 && y == 0 {
 		return
@@ -37,7 +28,7 @@ func PrintTileAt(x int, y int, tile Tile) {
 		v = aurora.Red("E")
 	}
 
-	PrintAt(x, y, v.String())
+	lib.PrintAt(x, y, v.String())
 }
 
 func RunGame(program *lib.Program, headless bool) int {
@@ -49,7 +40,7 @@ func RunGame(program *lib.Program, headless bool) int {
 	score := 0
 
 	if !headless {
-		ClearScreen()
+		lib.ClearScreen()
 	}
 
 	running := true
@@ -63,7 +54,7 @@ func RunGame(program *lib.Program, headless bool) int {
 				score = int(value)
 
 				if !headless {
-					PrintAt(42, 0, fmt.Sprintf("Score %d\n", score))
+					lib.PrintAt(42, 0, fmt.Sprintf("Score %d\n", score))
 				}
 			}
 

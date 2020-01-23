@@ -6,7 +6,7 @@ import (
 	"gonum.org/v1/gonum/stat/combin"
 )
 
-func FindMaxOutputWithFeedbackLoop(originalProgram *lib.Program) int64 {
+func FindMaxOutputWithFeedbackLoop(originalData []int64) int64 {
 	var inputs [5]chan int64
 	for i := range inputs {
 		inputs[i] = make(chan int64, 1)
@@ -17,7 +17,7 @@ func FindMaxOutputWithFeedbackLoop(originalProgram *lib.Program) int64 {
 	for permGen.Next() {
 		phases := permGen.Permutation(nil)
 
-		output := GetSignalWithFeedbackLoop(originalProgram, inputs, phases)
+		output := GetSignalWithFeedbackLoop(originalData, inputs, phases)
 
 		if output > max {
 			max = output
@@ -27,13 +27,14 @@ func FindMaxOutputWithFeedbackLoop(originalProgram *lib.Program) int64 {
 	return max
 }
 
-func GetSignalWithFeedbackLoop(originalProgram *lib.Program, inputs [5]chan int64, phases []int) int64 {
+func GetSignalWithFeedbackLoop(originalData []int64, inputs [5]chan int64, phases []int) int64 {
 	var program *lib.Program
 
 	for i := 0; i < 5; i++ {
-		programMemory := make([]int64, len(originalProgram.Data))
-		copy(programMemory, originalProgram.Data)
-		program = lib.NewProgram(fmt.Sprintf("Program %d", i), programMemory, inputs[i], inputs[(i+1)%len(inputs)])
+		data := make([]int64, len(originalData))
+		copy(data, originalData)
+		mem := lib.NewSliceMemory(data)
+		program = lib.NewProgramI(fmt.Sprintf("Program %d", i), mem, inputs[i], inputs[(i+1)%len(inputs)])
 		program.Input <- int64(phases[i] + 5)
 		go program.Run()
 	}

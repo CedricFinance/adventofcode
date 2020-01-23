@@ -3,7 +3,7 @@ package day18
 import (
 	"fmt"
 	"github.com/CedricFinance/adventofcode/2019/day18/dijkstra"
-	"github.com/CedricFinance/adventofcode/lib"
+	"github.com/CedricFinance/adventofcode/2019/lib"
 	"github.com/willf/bitset"
 	"math"
 	"os"

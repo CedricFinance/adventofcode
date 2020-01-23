@@ -8,7 +8,7 @@ import (
 
 func TestPart2(t *testing.T) {
 	program := lib.ReadProgramM("input.txt", 10000)
-	program.Data[0] = 2
+	program.Data.Write(0, 2)
 
 	dustCollected := Run(program, false)
 	assert.Equal(t, int64(833429), dustCollected)

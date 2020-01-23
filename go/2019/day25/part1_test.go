@@ -88,6 +88,8 @@ func RunGame(data []int64, initialCommands []string) string {
 			SendCommand(str, program)
 		}
 
+		fmt.Println()
+
 		end <- true
 	}()
 
