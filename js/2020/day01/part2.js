@@ -10,13 +10,10 @@ for(i = 0; i < report.length; i++) {
     first = report[i]
     for(j = 0; j < report.length; j++) {
         second = report[j]
-        for(k = 0; k < report.length; k++) {
-            third = report[k]
-            if (first+second+third == 2020) {
-                console.log(first*second*third)
-                break outter
-            }
+        const third = 2020 - first - second
+        if (numbers.has(third)) {
+            console.log(first * second * third)
+            break outter
         }
-
     }
 }
