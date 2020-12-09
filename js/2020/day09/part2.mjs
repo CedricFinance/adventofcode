@@ -2,46 +2,35 @@ import * as fs from 'fs'
 
 const numbers = fs.readFileSync("input.txt", "utf-8").trim().split("\n").map(line => parseInt(line, 10))
 
-const previousNumbers = new Set()
-for (let index = 0; index < 25; index++) {
-    const number = numbers[index];
-    previousNumbers.add(number)
-}
-
-function isSumOfPreviousNumbers(number, numbers) {
-    for (const first of numbers) {
-        if (numbers.has(number - first)) {
-            return true
-        }
-    }
-
-    return false
-}
-
-
 const target = 373803594
 
-let sum = 0
-let startIndex = 0
-let endIndex = 0
+function findContiguousSum(target, numbers, minLength = 2) {
+    let sum = 0
+    let startIndex = 0
+    let endIndex = 0
 
-for (let index = 0; index < numbers.length; index++) {
-    let number = numbers[index]
-    sum += number
-    if (sum === target && startIndex != index) {
-        endIndex = index
-        break
-    } else {
-        while(sum > target && startIndex < index) {
+    for (let index = 0; index < numbers.length; index++) {
+        let number = numbers[index]
+        sum += number
+
+        while(sum > target && index - startIndex + 1 > minLength) {
             sum -= numbers[startIndex]
             startIndex++
         }
+
         if (sum === target && startIndex != index) {
             endIndex = index
             break
         }
     }
+
+    return {
+        start: startIndex,
+        end: endIndex
+    }
 }
+
+const { start, end } = findContiguousSum(target, numbers)
 
 function minMax(numbers, start, end) {
     var min = numbers[start]
@@ -54,10 +43,10 @@ function minMax(numbers, start, end) {
     return {
         min,
         max
-    }   
+    }
 }
 
-console.log(sum, startIndex, endIndex);
+console.log("Found contiguous sum [%d, %d]", start, end);
 
-const { min, max } = minMax(numbers, startIndex, endIndex)
-console.log(min, max, min + max);
+const { min, max } = minMax(numbers, start, end)
+console.log("Min=%d, Max=%d, Answer=%d", min, max, min + max);
