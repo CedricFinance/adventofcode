@@ -15,10 +15,12 @@ fn main() {
         )
         .collect();
 
-    for number in &numbers {
-        if numbers.contains(&(2020 - number)) {
-            println!("first={} second={} result={}", number, 2020 - number, number * (2020 - number));
-            break
-        };
+    let result = numbers
+        .iter()
+        .find(|number| numbers.contains(&(2020 - *number)));
+
+    match result {
+        Some(number) => println!("first={} second={} result={}", number, 2020 - number, number * (2020 - number)),
+        None => println!("Failed to find two numbers whose sum is 2020")
     }
 }
