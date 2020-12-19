@@ -48,9 +48,7 @@ function computeRegexp(rules, index) {
 
     if (index == 11) {
         const r42 = computeRegexp(rules, 42)
-        console.log("42", r42);
         const r31 = computeRegexp(rules, 31)
-        console.log("31", r31);
         const subregexps = []
         for (let index = 1; index < maxLength / 2; index++) {
             subregexps.push(`(${r42}){${index}}(${r31}){${index}}`)
@@ -73,8 +71,6 @@ function computeRegexp(rules, index) {
 }
 
 computeRegexp(rules, 0)
-
-console.log(rules[0].matches)
 
 function isValid(str, regexp) {
     return str.match(regexp)
