@@ -18,6 +18,10 @@ class AocInput {
     lines() {
         return this.content().split("\n")
     }
+
+    blocks() {
+        return this.content().split("\n\n")
+    }
 }
 
 export function input(name = "input.txt") {
