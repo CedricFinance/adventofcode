@@ -1,76 +1,78 @@
 import * as aoc from '../aoc.js'
 
-const grid = aoc.input().lines().map(s => s.split("").map(c => c === '#'))
+aoc.run(function(input) {
+    const grid = input.lines().map(s => s.split("").map(c => c === '#'))
 
-let activeCells = new Set()
+    let activeCells = new Set()
 
-function cellKey(point) {
-    const [x, y, z] = point
-    return `${x}|${y}|${z}`
-}
+    function cellKey(point) {
+        const [x, y, z] = point
+        return `${x}|${y}|${z}`
+    }
 
-function decodeKey(str) {
-    return str.split("|").map(s => parseInt(s, 10))
-}
+    function decodeKey(str) {
+        return str.split("|").map(s => parseInt(s, 10))
+    }
 
-for (let row = 0; row < grid.length; row++) {
-    const r = grid[row];
-    for (let col = 0; col < r.length; col++) {
-        const cubeStatus = r[col];
-        if (cubeStatus) {
-            activeCells.add(cellKey([col, row, 0]))
+    for (let row = 0; row < grid.length; row++) {
+        const r = grid[row];
+        for (let col = 0; col < r.length; col++) {
+            const cubeStatus = r[col];
+            if (cubeStatus) {
+                activeCells.add(cellKey([col, row, 0]))
+            }
         }
     }
-}
 
-function getNeighboors(point) {
-    const [x, y, z] = point
-    const result = []
+    function getNeighboors(point) {
+        const [x, y, z] = point
+        const result = []
 
-    const offsets = [-1, 0, 1]
+        const offsets = [-1, 0, 1]
 
-    for (const zOffset of offsets) {
-        for (const xOffset of offsets) {
-            for (const yOffset of offsets) {
-                if (xOffset == 0 && yOffset == 0 && zOffset == 0) {
-                    continue
+        for (const zOffset of offsets) {
+            for (const xOffset of offsets) {
+                for (const yOffset of offsets) {
+                    if (xOffset == 0 && yOffset == 0 && zOffset == 0) {
+                        continue
+                    }
+                    result.push([ x + xOffset, y + yOffset, z + zOffset ])
                 }
-                result.push([ x + xOffset, y + yOffset, z + zOffset ])
             }
         }
+
+        return result
     }
 
-    return result
-}
+    function nextCycle(activeCells) {
+        const coordinates = new Set()
+        for (const cell of activeCells) {
+            const c = decodeKey(cell)
+            coordinates.add(c)
+            getNeighboors(c).forEach(n => coordinates.add(n))
+        }
 
-function nextCycle(activeCells) {
-    const coordinates = new Set()
-    for (const cell of activeCells) {
-        const c = decodeKey(cell)
-        coordinates.add(c)
-        getNeighboors(c).forEach(n => coordinates.add(n))
-    }
+        const newActiveCells = new Set()
 
-    const newActiveCells = new Set()
-
-    for (const point of coordinates) {
-        const actives = getNeighboors(point).map(p => activeCells.has(cellKey(p))).filter(active => active).length
-        if (activeCells.has(cellKey(point))) {
-            if (actives === 2 || actives === 3) {
-                newActiveCells.add(cellKey(point))
-            }
-        } else {
-            if (actives === 3) {
-                newActiveCells.add(cellKey(point))
+        for (const point of coordinates) {
+            const actives = getNeighboors(point).map(p => activeCells.has(cellKey(p))).filter(active => active).length
+            if (activeCells.has(cellKey(point))) {
+                if (actives === 2 || actives === 3) {
+                    newActiveCells.add(cellKey(point))
+                }
+            } else {
+                if (actives === 3) {
+                    newActiveCells.add(cellKey(point))
+                }
             }
         }
+
+        return newActiveCells
     }
 
-    return newActiveCells
-}
+    for (let cycle = 0; cycle < 6; cycle++) {
+        activeCells = nextCycle(activeCells)
+    }
 
-for (let cycle = 0; cycle < 6; cycle++) {
-    activeCells = nextCycle(activeCells)
-}
-
-console.log(activeCells.size);
+    return activeCells.size
+})

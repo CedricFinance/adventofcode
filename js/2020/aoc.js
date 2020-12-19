@@ -7,6 +7,10 @@ class AocInput {
         this.filepath = filepath
     }
 
+    name() {
+        return path.basename(this.filepath)
+    }
+
     content() {
         return fs.readFileSync(this.filepath, "utf-8").trim()
     }
@@ -37,4 +41,15 @@ function toInputsFolder(dayPath) {
     const aocRoot = currentPath
 
     return path.join(aocRoot, "inputs", year, day)
+}
+
+export function run(callback) {
+    let inputName
+    if (process.argv.length > 2) {
+        inputName = process.argv[2]
+    }
+    const aocInput = input(inputName)
+    console.log("Solving problem with '%s'", aocInput.name())
+    const result = callback(aocInput)
+    console.log("result:", result);
 }
