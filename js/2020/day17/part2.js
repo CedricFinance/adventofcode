@@ -1,12 +1,11 @@
-import * as fs from 'fs'
+import * as aoc from '../aoc.js'
 
-const grid = fs.readFileSync("input.txt", "utf-8").trim().split("\n").map(s => s.split("").map(c => c === '#'))
+const grid = aoc.input().lines().map(s => s.split("").map(c => c === '#'))
 
 let activeCells = new Set()
 
 function cellKey(point) {
-    const [x, y, z] = point
-    return `${x}|${y}|${z}`
+    return point.join("|")
 }
 
 function decodeKey(str) {
@@ -18,24 +17,26 @@ for (let row = 0; row < grid.length; row++) {
     for (let col = 0; col < r.length; col++) {
         const cubeStatus = r[col];
         if (cubeStatus) {
-            activeCells.add(cellKey([col, row, 0]))
+            activeCells.add(cellKey([col, row, 0, 0]))
         }
     }
 }
 
 function getNeighboors(point) {
-    const [x, y, z] = point
+    const [x, y, z, w] = point
     const result = []
 
     const offsets = [-1, 0, 1]
 
-    for (const zOffset of offsets) {
-        for (const xOffset of offsets) {
-            for (const yOffset of offsets) {
-                if (xOffset == 0 && yOffset == 0 && zOffset == 0) {
-                    continue
+    for (const xOffset of offsets) {
+        for (const yOffset of offsets) {
+            for (const zOffset of offsets) {
+                for (const wOffset of offsets) {
+                    if (xOffset == 0 && yOffset == 0 && zOffset == 0 && wOffset == 0) {
+                        continue
+                    }
+                    result.push([ x + xOffset, y + yOffset, z + zOffset, w + wOffset ])
                 }
-                result.push([ x + xOffset, y + yOffset, z + zOffset ])
             }
         }
     }
@@ -70,6 +71,7 @@ function nextCycle(activeCells) {
 }
 
 for (let cycle = 0; cycle < 6; cycle++) {
+    console.log("cycle:", cycle);
     activeCells = nextCycle(activeCells)
 }
 
