@@ -1,5 +1,3 @@
-import { log } from 'console'
-import { parse } from 'path'
 import * as aoc from '../aoc.js'
 
 /**
@@ -14,13 +12,10 @@ function parseImage(str) {
     return { id: parseInt(id, 10), data }
 }
 
-
-
 aoc.run(function(input) {
     const blocks = input.blocks()
 
     const images = blocks.map(parseImage)
-    console.log(images[0]);
 
     const b = images[0].data.length - 1
 
@@ -55,15 +50,12 @@ aoc.run(function(input) {
 
     }
 
-//    console.log(bordersMap);
     const counts = new Map()
     for (const [id, bordersList] of bordersMap.entries()) {
         if (bordersList.length == 1) {
             counts.set(bordersList[0].imageId, (counts.get(bordersList[0].imageId) || 0) + 1)
         }
     }
-
-    console.log(counts);
 
     let result = 1
     for (const [imageId, count] of counts.entries()) {
