@@ -1,4 +1,4 @@
-fs = require('fs')
+import * as aoc from '../aoc.js'
 
 function parseEntry(str) {
     const [policy, password] = str.split(":").map(str => str.trim())
@@ -16,6 +16,8 @@ function isValid(password, policy) {
     return count >= policy.min && count <= policy.max
 }
 
-const entries = fs.readFileSync("input.txt", "utf-8").trim().split("\n").map(parseEntry)
-const validPasswords = entries.filter(entry => isValid(entry.password, entry.policy))
-console.log(validPasswords.length)
+aoc.run(function(input) {
+    const entries =input.lines().map(parseEntry)
+    const validPasswords = entries.filter(entry => isValid(entry.password, entry.policy))
+    return validPasswords.length
+})

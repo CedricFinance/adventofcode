@@ -1,17 +1,17 @@
-const { listenerCount } = require('process')
+import * as aoc from '../aoc.js'
 
-fs = require('fs')
+aoc.run(function(input) {
+    const lines = input.lines()
 
-const lines = fs.readFileSync("input.txt", "utf-8").trim().split("\n")
+    var x = 0
+    var trees = 0
 
-var x = 0
-var trees = 0
-
-for (const line of lines) {
-    if (line[x % line.length] == "#") {
-        trees++
+    for (const line of lines) {
+        if (line[x % line.length] == "#") {
+            trees++
+        }
+        x += 3
     }
-    x += 3
-}
 
-console.log(trees)
+    return trees
+})

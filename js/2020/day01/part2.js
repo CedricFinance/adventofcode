@@ -1,19 +1,22 @@
-fs = require('fs')
+import * as aoc from '../aoc.js'
 
-const report = fs.readFileSync("input.txt", "utf-8").trim().split("\n").map(x => parseInt(x, 10))
-const numbers = new Set()
+aoc.run(function(input) {
+    const report = input.numbers()
 
-report.forEach(d => numbers.add(d))
+    const numbers = new Set()
 
-outter:
-for(i = 0; i < report.length; i++) {
-    first = report[i]
-    for(j = 0; j < report.length; j++) {
-        second = report[j]
-        const third = 2020 - first - second
-        if (numbers.has(third)) {
-            console.log(first * second * third)
-            break outter
+    report.forEach(d => numbers.add(d))
+
+    for(let i = 0; i < report.length; i++) {
+        const first = report[i]
+        for(let j = 0; j < report.length; j++) {
+            const second = report[j]
+            const third = 2020 - first - second
+            if (numbers.has(third)) {
+                return first * second * third
+            }
         }
     }
-}
+
+    return 0
+})

@@ -1,25 +1,26 @@
-fs = require('fs')
-const lines = fs.readFileSync("input.txt", "utf-8").trim().split("\n")
+import * as aoc from '../aoc.js'
 
-function decodeBoardingPass(str) {
-   const rowStr = str.slice(0, 7)
-   const colStr = str.slice(7)
+aoc.run(function(input) {
+    const lines = input.lines()
 
-   const row = parseInt(rowStr.replace(/F/g, '0').replace(/B/g, '1'), 2)
-   const col = parseInt(colStr.replace(/L/g, '0').replace(/R/g, '1'), 2)
+    function decodeBoardingPass(str) {
+    const rowStr = str.slice(0, 7)
+    const colStr = str.slice(7)
 
-   return {
-       row, col,
-       seatId: row * 8 + col
-   }
-}
+    const row = parseInt(rowStr.replace(/F/g, '0').replace(/B/g, '1'), 2)
+    const col = parseInt(colStr.replace(/L/g, '0').replace(/R/g, '1'), 2)
 
-const passes = lines.map(decodeBoardingPass)
+    return {
+        row, col,
+        seatId: row * 8 + col
+    }
+    }
 
-const ids = passes.map(p => p.seatId).sort(function(a, b) {
-    return -(a - b);
+    const passes = lines.map(decodeBoardingPass)
+
+    const ids = passes.map(p => p.seatId).sort(function(a, b) {
+        return -(a - b);
+    })
+
+    return ids[0]
 })
-
-console.log(
-    ids[0]
-);

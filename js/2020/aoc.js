@@ -19,6 +19,10 @@ class AocInput {
         return this.content().split("\n")
     }
 
+    numbers() {
+        return this.lines().map(x => parseInt(x, 10))
+    }
+
     blocks() {
         return this.content().split("\n\n")
     }

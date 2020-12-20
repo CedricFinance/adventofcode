@@ -1,10 +1,17 @@
-fs = require('fs')
+import * as aoc from '../aoc.js'
 
-const report = fs.readFileSync("input.txt", "utf-8").trim().split("\n").map(x => parseInt(x, 10))
-const numbers = new Set()
+aoc.run(function(input) {
+  const report = input.numbers()
 
-report.forEach(d => numbers.add(d))
+  const numbers = new Set()
 
-report.forEach(d => {
-  if (numbers.has(2020-d)) { console.log(d * (2020 - d)) }
+  report.forEach(d => numbers.add(d))
+
+  for (const d of report) {
+    if (numbers.has(2020-d)) {
+      return d * (2020 - d)
+    }
+  }
+
+  return 0
 })
