@@ -25,7 +25,11 @@ class AocInput {
 }
 
 export function input(name = "input.txt") {
-    return inputForDay(path.dirname(process.argv[1]), name)
+    return inputForDay(path.dirname(currentScript()), name)
+}
+
+function currentScript() {
+    return process.argv[1]
 }
 
 function inputForDay(dayPath, name) {
@@ -65,5 +69,46 @@ export async function run(callback) {
     const aocInput = input(inputName)
     console.log("Solving problem with '%s'", aocInput.name())
     const result = callback(aocInput)
-    console.log("result:", result);
+
+    const prefix = path.basename(aocInput.name(), ".txt")
+    const part = path.basename(currentScript(), ".js")
+    const expectedResultFilename = `${prefix}-${part}-expected.json`
+    const expectedResultFilepath = path.join(path.dirname(aocInput.filepath), expectedResultFilename)
+
+    if (fs.existsSync(expectedResultFilepath)) {
+        const expectedResult = fs.readFileSync(expectedResultFilepath, "utf-8")
+        if (expectedResult === String(result)) {
+            console.log("✅ You got the expected result:", result)
+        } else {
+            console.log("❎ You don't have the expected result: got '%s', expecting '%s", result, expectedResult)
+        }
+    } else {
+        console.log("You found:", result);
+
+        if (await saveResult()) {
+            console.log(`Saving expected result in ${expectedResultFilename}`)
+            fs.writeFileSync(expectedResultFilepath, String(result), "utf-8")
+        }
+    }
+}
+
+import * as readline from 'readline'
+
+function yesNoQuestion(text) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    return new Promise(resolve => {
+        rl.question(`${text} (y|N)`, (answer) => {
+            rl.close();
+            resolve(answer)
+        });
+    })
+}
+
+async function saveResult() {
+    const save = await yesNoQuestion("Is this the right answer?")
+    return save.toLowerCase() == "y"
 }
