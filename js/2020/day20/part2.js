@@ -1,43 +1,5 @@
-import { log } from 'console'
-import { parse } from 'path'
 import * as aoc from '../aoc.js'
-
-/**
- * @param {string} str
- */
-function parseImage(str) {
-    str = str.replace(/#/g, "1").replace(/\./g, "0")
-    const [idStr, ...data] = str.split("\n")
-
-    const [_, id] = idStr.slice(0, idStr.length - 1).split(" ")
-
-    return { id: parseInt(id, 10), data }
-}
-
-function getBorders(data) {
-    const b = data.length - 1
-
-    const left = data.map(r => r[0])
-    const right = data.map(r => r[b])
-
-    const borders = {
-        topBorder: parseInt(data[0], 2),
-        topBorderFlipped: parseInt(data[0].split("").reverse().join(""), 2),
-
-        bottomBorder: parseInt(data[b], 2),
-        bottomBorderFlipped: parseInt(data[b].split("").reverse().join(""), 2),
-
-        leftBorder: parseInt(left.join(""), 2),
-        leftBorderFlipped: parseInt(Array.from(left).reverse().join(""), 2),
-
-        rightBorder: parseInt(right.join(""), 2),
-        rightBorderFlipped: parseInt(Array.from(right).reverse().join(""), 2)
-
-    }
-
-    return borders
-}
-
+import { getBorders, parseImage } from './common.js'
 
 function flipHorizontally(image) {
     const newData = Array.from(image.data).reverse()
@@ -80,6 +42,7 @@ function rotateRight(image) {
 
 function rotateDataLeft(data) {
     const b = data.length
+
     const newData = data.map(_ => [])
     for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
         const row = data[rowIndex];
@@ -87,6 +50,7 @@ function rotateDataLeft(data) {
             newData[rowIndex][colIndex] = data[colIndex][b-rowIndex-1]
         }
     }
+
     return newData.map(r => r.join(""))
 }
 
@@ -101,24 +65,19 @@ function rotateLeft(image) {
 
 aoc.run(function(input) {
     const blocks = input.blocks()
-
     const images = blocks.map(parseImage)
 
     const bordersMap = new Map()
 
     for (const image of images) {
+        image.borders = getBorders(image.data)
 
-        const borders = getBorders(image.data)
-
-        image.borders = borders
-
-        for (const borderName of Object.getOwnPropertyNames(borders)) {
-            const borderValue = borders[borderName]
+        for (const borderName of Object.getOwnPropertyNames(image.borders)) {
+            const borderValue = image.borders[borderName]
             const d = bordersMap.get(borderValue) || []
             d.push({ border: borderName, imageId: image.id })
             bordersMap.set(borderValue, d)
         }
-
     }
 
     const imagesMap = new Map()
