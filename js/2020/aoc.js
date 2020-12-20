@@ -47,7 +47,17 @@ function toInputsFolder(dayPath) {
     return path.join(aocRoot, "inputs", year, day)
 }
 
-export function run(callback) {
+/**
+ * This callback is called with the problem input.
+ * @callback runCallback
+ * @param {AocInput} input
+ * @returns {string|number}
+ */
+
+/**
+ * @param {runCallback} callback
+ */
+export async function run(callback) {
     let inputName
     if (process.argv.length > 2) {
         inputName = process.argv[2]
