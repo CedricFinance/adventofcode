@@ -70,29 +70,34 @@ export async function run(callback) {
     if (process.argv.length > 2) {
         inputName = process.argv[2]
     }
-    const aocInput = input(inputName)
-    console.log("Solving problem with '%s'", aocInput.name())
-    const result = callback(aocInput)
 
-    const prefix = path.basename(aocInput.name(), ".txt")
-    const part = path.basename(currentScript(), ".js")
-    const expectedResultFilename = `${prefix}-${part}-expected.json`
-    const expectedResultFilepath = path.join(path.dirname(aocInput.filepath), expectedResultFilename)
+    try {
+        const aocInput = input(inputName)
+        console.log("Solving problem with '%s'", aocInput.name())
+        const result = callback(aocInput)
 
-    if (fs.existsSync(expectedResultFilepath)) {
-        const expectedResult = fs.readFileSync(expectedResultFilepath, "utf-8")
-        if (expectedResult === String(result)) {
-            console.log("✅ You got the expected result:", result)
+        const prefix = path.basename(aocInput.name(), ".txt")
+        const part = path.basename(currentScript(), ".js")
+        const expectedResultFilename = `${prefix}-${part}-expected.json`
+        const expectedResultFilepath = path.join(path.dirname(aocInput.filepath), expectedResultFilename)
+
+        if (fs.existsSync(expectedResultFilepath)) {
+            const expectedResult = fs.readFileSync(expectedResultFilepath, "utf-8")
+            if (expectedResult === String(result)) {
+                console.log("✅ You got the expected result:", result)
+            } else {
+                console.log("❎ You don't have the expected result: got '%s', expecting '%s", result, expectedResult)
+            }
         } else {
-            console.log("❎ You don't have the expected result: got '%s', expecting '%s", result, expectedResult)
-        }
-    } else {
-        console.log("You found:", result);
+            console.log("You found:", result);
 
-        if (await saveResult()) {
-            console.log(`Saving expected result in ${expectedResultFilename}`)
-            fs.writeFileSync(expectedResultFilepath, String(result), "utf-8")
+            if (await saveResult()) {
+                console.log(`Saving expected result in ${expectedResultFilename}`)
+                fs.writeFileSync(expectedResultFilepath, String(result), "utf-8")
+            }
         }
+    } catch(ex) {
+        console.error(ex)
     }
 }
 
