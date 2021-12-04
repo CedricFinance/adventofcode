@@ -1,5 +1,9 @@
 import * as aoc from '../../2020/aoc.js'
 
+/**
+ *
+ * @param {Grid} grid
+ */
 function win(grid) {
     for (const row of grid) {
         if (row.every(num => num.marked)) {
@@ -16,6 +20,10 @@ function win(grid) {
     return false
 }
 
+/**
+ *
+ * @param {Grid} grid
+ */
 function unmarkedSum(grid) {
     var result = 0;
 
@@ -35,6 +43,7 @@ aoc.run(function(input) {
 
     const numbers = blocks.shift().split(",").map(str => parseInt(str, 10))
 
+    /** @type Grid[] */
     const grids = []
     for (const block of blocks) {
         grids.push(
