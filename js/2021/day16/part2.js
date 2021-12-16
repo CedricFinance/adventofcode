@@ -20,66 +20,120 @@ const hex2bin = {
 }
 
 
+class Packet {
+    /** @type number */
+    version
+
+    /** @type number */
+    type
+
+    /**
+     *
+     * @param {number} version
+     * @param {number} type
+     */
+    constructor(version, type) {
+        this.version = version
+        this.type = type
+    }
+}
+
+class LiteralPacket extends Packet {
+
+    /** @type number */
+    value
+
+    /**
+     *
+     * @param {number} version
+     * @param {number} value
+     */
+    constructor(version, value) {
+        super(version, 4)
+        this.value = value
+    }
+}
+
+class OperatorPacket extends Packet {
+
+    /** @type Packet[] */
+    subpackets
+
+    /**
+     *
+     * @param {number} version
+     * @param {number} type
+     * @param {Packet[]} subpackets
+     */
+    constructor(version, type, subpackets) {
+        super(version, type)
+        this.subpackets = subpackets
+    }
+}
+
 /**
  *
  * @param {string[]} data
  */
 function decodePackets(data, count = Number.MAX_VALUE) {
-    let d = data
     const packets = []
     let remaining = count
-    while(d.length > 0 && remaining > 0) {
-        const version = parseInt(d.splice(0, 3).join(""), 2)
-        const type = parseInt(d.splice(0, 3).join(""), 2)
-        if (type == 4) {
-            //literal
-            const allbits = []
-            var bits = []
-            do {
-                bits = d.splice(0, 5)
-                allbits.push(...bits.slice(1))
-            } while(bits[0] == '1')
-            const value = parseInt(allbits.join(""), 2)
-            packets.push({
-                version,
-                type,
-                value
-            })
-            //d.splice(0,3) //trailing
-        } else {
-            // operator
-            const lengthType = parseInt(d.splice(0, 1).join(""), 2)
-            if (lengthType == 0) {
-                const totalLength = parseInt(d.splice(0, 15).join(""), 2)
-                packets.push({
-                    version,
-                    type,
-                    lengthType,
-                    totalLength,
-                    subpackets: decodePackets(d.splice(0, totalLength))
-                })
-            } else {
-                const subPacketsCount = parseInt(d.splice(0, 11).join(""), 2)
-                packets.push({
-                    version,
-                    type,
-                    lengthType,
-                    subPacketsCount,
-                    subpackets: decodePackets(d, subPacketsCount)
-                })
-            }
-        }
+    while(data.length > 0 && remaining > 0) {
+        packets.push(decodePacket(data))
         remaining--
     }
     return packets
 }
 
+/**
+ *
+ * @param {string[]} data
+ */
+ function decodePacket(data) {
+    const version = parseInt(data.splice(0, 3).join(""), 2)
+    const type = parseInt(data.splice(0, 3).join(""), 2)
+    if (type == 4) {
+        //literal
+        const allbits = []
+        var bits = []
+        do {
+            bits = data.splice(0, 5)
+            allbits.push(...bits.slice(1))
+        } while(bits[0] == '1')
+        const value = parseInt(allbits.join(""), 2)
+        return new LiteralPacket(version, value)
+    }
+
+    // operator
+    const lengthType = parseInt(data.splice(0, 1).join(""), 2)
+    if (lengthType == 0) {
+        const totalLength = parseInt(data.splice(0, 15).join(""), 2)
+        return new OperatorPacket(
+            version,
+            type,
+            decodePackets(data.splice(0, totalLength))
+        )
+    } else {
+        const subPacketsCount = parseInt(data.splice(0, 11).join(""), 2)
+        return new OperatorPacket(
+            version,
+            type,
+            decodePackets(data, subPacketsCount)
+        )
+    }
+}
+
+/**
+ *
+ * @param {LiteralPacket|OperatorPacket} packet
+ */
 function evalPacket(packet) {
 
-    if (packet.type == 4) {
+    if (packet instanceof LiteralPacket) {
         return packet.value
     }
 
+    /** @type number[] */
     const values = packet.subpackets.map(evalPacket)
 
     switch (packet.type) {
@@ -110,13 +164,9 @@ function evalPacket(packet) {
 aoc.run(function(input) {
     const data = input.content().split("").flatMap(v => hex2bin[v].split(""))
 
-    var result = 0
+    const packet = decodePacket(data)
+    console.log(packet);
 
-    const packets = decodePackets(data)
-    console.log(packets);
-
-    result = evalPacket(packets[0])
-
-    return result
+    return evalPacket(packet)
 })
 
