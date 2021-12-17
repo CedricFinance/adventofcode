@@ -2,15 +2,35 @@ import * as aoc from '../../2020/aoc.js'
 
 /**
  *
- * @param {*} xVelocity
- * @param {*} yVelocity
- * @param {*} xRange
- * @param {*} yRange
+ * @param {{x: number, y: number}} coords
+ * @param {{xRange: [number, number], yRange: [number, number]}} target
+ * @returns
  */
-function simulate(xVelocity, yVelocity, xRange, yRange) {
+ function targetReached(coords, { xRange, yRange }) {
+    return (coords.x >= xRange[0] && coords.x <= xRange[1])
+        && (coords.y >= yRange[0] && coords.y <= yRange[1])
+}
+
+/**
+ *
+ * @param {{x: number, y: number}} coords
+ * @param {{xRange: [number, number], yRange: [number, number]}} target
+ * @returns
+ */
+ function targetUnreachable(coords, { xRange, yRange }) {
+    return coords.x > xRange[1] || coords.y < yRange[0]
+ }
+
+/**
+ *
+ * @param {number} xVelocity
+ * @param {number} yVelocity
+ * @param {{xRange: [number, number], yRange: [number, number]}} target
+ */
+function simulate(xVelocity, yVelocity, target) {
     var coords = { x: 0, y: 0 }
     var maxY = 0
-    while( (coords.x < xRange[0] || coords.x > xRange[1]) || (coords.y < yRange[0] || coords.y > yRange[1]) ) {
+    while( !targetReached(coords, target) ) {
 
         coords.x += xVelocity
         coords.y += yVelocity
@@ -24,24 +44,12 @@ function simulate(xVelocity, yVelocity, xRange, yRange) {
             maxY = coords.y
         }
 
-        if (coords.x > xRange[1] || coords.y < yRange[0]) {
-            /** @type [boolean, number] */
-            const result = [false, maxY]
-            return result
+        if (targetUnreachable(coords, target)) {
+            return { success: false, maxY }
         }
-
-      /*  if (xVelocity == 0 && yVelocity == 0) {
-            /** @type [boolean, number] * /
-            const result = [false, maxY]
-            return result
-        }
-        */
     }
 
-    /** @type [boolean, number] */
-    const r = [true, maxY]
-
-    return r
+    return { success: true, maxY }
 }
 
 aoc.run(function(input) {
@@ -57,9 +65,9 @@ aoc.run(function(input) {
     var maxY = 0
     for (let xVelocity= 0; xVelocity <= xRange[1]; xVelocity++) {
         for (let yVelocity = yRange[0]; yVelocity < 100; yVelocity++) {
-            const [ok, maxYReached] = simulate(xVelocity, yVelocity, xRange, yRange)
+            const { success } = simulate(xVelocity, yVelocity, { xRange, yRange })
 
-            if (ok) {
+            if (success) {
                 results.add(`${xVelocity},${yVelocity}`)
             }
         }
@@ -68,5 +76,3 @@ aoc.run(function(input) {
 
     return results.size
 })
-
-// 1078
