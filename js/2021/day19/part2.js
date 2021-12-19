@@ -1,4 +1,5 @@
 import * as aoc from '../../2020/aoc.js'
+import { parseScanners } from './index.js'
 
 /**
  *
@@ -89,12 +90,7 @@ function manhattanDistance([x1, y1, z1], [x2, y2, z2]) {
 }
 
 aoc.run(function(input) {
-    const scanners = input.blocks().map((block, id) => {
-        const lines = block.split("\n")
-        const name = lines.shift()
-        const positions = lines.map(line => line.split(",").map(s => parseInt(s, 10)))
-        return { id, name, positions, rotations: null, deltas: null, deltasMap: null, position: null }
-    })
+    const scanners = parseScanners(input)
 
     scanners.forEach(scanner => {
         const rotations = new Array(24)

@@ -1,4 +1,5 @@
 import * as aoc from '../../2020/aoc.js'
+import { parseScanners } from './index.js'
 
 /**
  *
@@ -85,12 +86,7 @@ function add(first, second) {
 }
 
 aoc.run(function(input) {
-    const scanners = input.blocks().map((block, id) => {
-        const lines = block.split("\n")
-        const name = lines.shift()
-        const positions = lines.map(line => line.split(",").map(s => parseInt(s, 10)))
-        return { id, name, positions, rotations: null, deltas: null, deltasMap: null, position: null }
-    })
+    const scanners = parseScanners(input)
 
     scanners.forEach(scanner => {
         const rotations = new Array(24)
@@ -181,11 +177,8 @@ aoc.run(function(input) {
 
     const beacons = new Set()
     for (const scanner of scanners) {
-        if (scanner.position == null) {
-            console.log("bug")
-        }
         for (const pos of scanner.positions) {
-            beacons.add(JSON.stringify(pos))
+            beacons.add(pos.join())
         }
     }
 
