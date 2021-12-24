@@ -91,7 +91,7 @@ export async function run(callback) {
         } else {
             console.log("You found:", result);
 
-            if (await saveResult()) {
+            if (process.stdout.isTTY && await saveResult()) {
                 console.log(`Saving expected result in ${expectedResultFilename}`)
                 fs.writeFileSync(expectedResultFilepath, String(result), "utf-8")
             }
