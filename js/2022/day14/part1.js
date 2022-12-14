@@ -1,96 +1,208 @@
 import * as aoc from '../../2020/aoc.js'
 
-function displayMap(map) {
-  for (const line of map) {
+
+/**
+ *
+ * @param {Iterable<number>} arr
+ * @returns [number, number]
+ */
+ function minMax(arr) {
+  var min= Number.MAX_VALUE
+  var max= Number.MIN_VALUE
+
+  for (const c of arr) {
+      if (c > max) { max = c }
+      if (c < min) { min = c }
+  }
+
+  return [min, max]
+}
+
+ /**
+ * @typedef {Object} Cell
+ * @property {number} row
+ * @property {number} col
+ */
+
+/**
+ * @template T
+ * @callback DefaultValueCallback
+ * @param {Cell} cell
+ * @returns {T}
+ */
+
+/**
+ * @template T
+ */
+class SparseGrid {
+  /**
+   * @type {Map<number,Map<number,T>>}
+   */
+  content = new Map()
+
+  /**
+   * @type {DefaultValueCallback<T>}
+   */
+  defaultValueCallback
+
+  /**
+   *
+   * @param {DefaultValueCallback<T>} defaultValueCallback
+   */
+  constructor(defaultValueCallback) {
+    this.defaultValueCallback = defaultValueCallback
+  }
+
+  /**
+   * @param {Cell} cell
+   * @returns {T}
+   */
+  get(cell) {
+    const itemRow = this.content.get(cell.row)
+
+    if (itemRow === undefined) {
+      return this.defaultValueCallback(cell)
+    }
+
+    const item = itemRow.get(cell.col)
+
+    if (item === undefined) {
+      return this.defaultValueCallback(cell)
+    }
+
+    return item
+  }
+
+  /**
+   * @param {Cell} cell
+   * @param {T} value
+   */
+  set(cell, value) {
+    var itemRow = this.content.get(cell.row)
+
+    if (itemRow === undefined) {
+      itemRow = new Map()
+      this.content.set(cell.row, itemRow)
+    }
+
+    itemRow.set(cell.col, value)
+  }
+
+  /**
+   * @param {Cell} cell
+   */
+  remove(cell) {
+    var itemRow = this.content.get(cell.row)
+
+    if (itemRow === undefined) {
+      return
+    }
+
+    itemRow.delete(cell.col)
+  }
+
+  range() {
+    const [minRow, maxRow] = minMax(this.content.keys())
+    const rowsMinMaxs = [...this.content.values()].map(row => minMax(row.keys()))
+    const minCol = Math.min(...rowsMinMaxs.map(([min, max]) => min))
+    const maxCol = Math.max(...rowsMinMaxs.map(([min, max]) => max))
+
+    return { minRow, minCol, maxRow, maxCol }
+  }
+
+  getRange(range) {
+    const result = []
+    for (let row = range.minRow; row <= range.maxRow; row++) {
+      const rowItems = []
+      result.push(rowItems)
+      for (let col = range.minCol; col <= range.maxCol; col++) {
+        rowItems.push(this.get({ row, col }))
+      }
+    }
+    return result
+  }
+}
+
+function display(grid, range) {
+  for (const line of grid.getRange(range)) {
     console.log(line.join(""))
   }
   console.log()
 }
 
+/**
+ * @param {string} str
+ * @returns {Cell}
+ */
+function parseCell(str) {
+  const [col, row] = str.split(",").map(s => parseInt(s, 10))
+  return { row, col }
+}
+
 aoc.run(function(input) {
-    const lines = input.lines().map(line => line.split(" -> ").map(part => part.split(",").map(s => parseInt(s, 10))))
+  const lines = input.lines().map(line => line.split(" -> ").map(parseCell))
 
-    var result = 0
+  var grid = new SparseGrid(() => '.')
 
-    console.log(result);
-    
-    const sandStartX = 500;
-    const sandStartY = 0;
+  for (const line of lines) {
+    const currentPoint = {...line[0]}
+    grid.set(currentPoint, "#")
+    for (let i = 1; i < line.length; i++) {
+      const destinationPoint = line[i];
 
-    var minX, maxX, minY, maxY
-    minX = maxX = lines[0][0][0]
-    minY = maxY = lines[0][0][1]
-    for (const line of lines) {
-      for (const point of line) {
-        if (point[0] < minX) {
-          minX = point[0]
-        }
-        if (point[1] < minY) {
-          minY = point[1]
-        }
-        if (point[0] > maxX) {
-          maxX = point[0]
-        }
-        if (point[1] > maxY) {
-          maxY = point[1]
-        }
+      while(currentPoint.row != destinationPoint.row || currentPoint.col != destinationPoint.col) {
+        currentPoint.row += Math.sign(destinationPoint.row - currentPoint.row)
+        currentPoint.col += Math.sign(destinationPoint.col - currentPoint.col)
+        grid.set(currentPoint, "#")
       }
+
     }
+  }
 
-    console.log(`min: (${minX}, ${minY}, max: ${maxX}, ${maxY})`);
+  var { minCol, maxCol, minRow, maxRow } = grid.range()
+  console.log(`min: (${minCol}, ${minRow}) max: (${maxCol}, ${maxRow})`);
 
-    var map = new Array(maxY+1);
-    for (let i = 0; i < map.length; i++) {
-      const row = new Array(maxX-minX+1+1)
-      row.fill('.')
-      map[i] = row
-    }
+  const displayRange = {
+    minRow: 0,
+    minCol: minCol - 1,
+    maxRow,
+    maxCol: maxCol + 1,
+  }
 
-    for (const line of lines) {
-      const currentPoint = [...line[0]]
-      map[currentPoint[1]][currentPoint[0]-minX+1] = "#"
-      for (let i = 1; i < line.length; i++) {
-        const destinationPoint = line[i];
+  display(grid, displayRange)
+  var count = 0
 
-        while(currentPoint[0] != destinationPoint[0] || currentPoint[1] != destinationPoint[1]) {
-          currentPoint[0] += Math.sign(destinationPoint[0] - currentPoint[0])
-          currentPoint[1] += Math.sign(destinationPoint[1] - currentPoint[1])
-          map[currentPoint[1]][currentPoint[0]-minX+1] = "#"
-        }
-        
-      }
-    }
+  const sandStartRow = 0;
+  const sandStartCol = 500;
 
-    displayMap(map)
-    var count = 0
+  while(true) {
+    var sand = { row: sandStartRow, col: sandStartCol }
+
     while(true) {
-      var sand = [ sandStartX, sandStartY ]
+      grid.set(sand, "o")
+      //display(grid, displayRange)
 
-      while(true) {
-        map[sand[1]][sand[0]-minX+1] = "o"
-        //displayMap(map)
-
-        if (sand[1] >= maxY) {
-          return count
-        }
-
-        if (map[sand[1]+1][sand[0]-minX+1] == ".") {
-          map[sand[1]][sand[0]-minX+1] = "."
-          sand[1]++
-        } else if (map[sand[1]+1][sand[0]-minX+1-1] == ".") {
-          map[sand[1]][sand[0]-minX+1] = "."
-          sand[1]++
-          sand[0]--
-        } else if (map[sand[1]+1][sand[0]-minX+1+1] == ".") {
-          map[sand[1]][sand[0]-minX+1] = "."
-          sand[1]++
-          sand[0]++
-        } else {
-          break
-        }
+      if (sand.row >= maxRow) {
+        display(grid, displayRange)
+        return count
       }
 
-      count++
+      const previousPosition = {...sand}
+      if (grid.get({ row: sand.row+1, col: sand.col }) == ".") {
+        sand.row++
+      } else if (grid.get({ row: sand.row+1, col: sand.col-1 }) == ".") {
+        sand.row++
+        sand.col--
+      } else if (grid.get({ row: sand.row+1, col: sand.col+1 }) == ".") {
+        sand.row++
+        sand.col++
+      } else {
+        break
+      }
+
+      grid.remove(previousPosition)
     }
-  return result
+
+    count++
+  }
 })
