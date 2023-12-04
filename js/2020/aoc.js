@@ -1,6 +1,34 @@
 import * as path from 'path';
 import * as fs from 'fs'
 
+export const Sets = {
+
+    /**
+     * @template T
+     * @param {Set<T>} first
+     * @param {Set<T>} second
+     * @returns {Set<T>}
+     */
+    intersect(first, second) {
+        var biggest, smallest
+        if (first.size < second.size) {
+            smallest = first
+            biggest = second
+        } else {
+            smallest = second
+            biggest = first
+        }
+
+        const result = new Set()
+        for (const elem of smallest) {
+            if (biggest.has(elem)) {
+                result.add(elem)
+            }
+        }
+
+        return result
+    }
+}
 class AocInput {
 
     constructor(filepath) {
