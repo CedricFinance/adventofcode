@@ -43,6 +43,10 @@ class AocInput {
         return fs.readFileSync(this.filepath, "utf-8").trim()
     }
 
+    rawContent() {
+        return fs.readFileSync(this.filepath, "utf-8")
+    }
+
     lines() {
         return this.content().split("\n")
     }
@@ -52,7 +56,7 @@ class AocInput {
     }
 
     blocks() {
-        return this.content().split("\n\n")
+        return this.rawContent().split("\n\n")
     }
 }
 
