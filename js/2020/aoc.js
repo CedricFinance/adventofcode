@@ -29,6 +29,14 @@ export const Sets = {
         return result
     }
 }
+
+/**
+* @param {string} str
+*/
+export function parseNumberList(str) {
+ return str.split(/ +/).map(s => parseInt(s, 10))
+}
+
 class AocInput {
 
     constructor(filepath) {
@@ -106,7 +114,7 @@ export async function run(callback) {
     try {
         const aocInput = input(inputName)
         console.log("Solving problem with '%s'", aocInput.name())
-        const result = callback(aocInput)
+        const result = await callback(aocInput)
 
         const prefix = path.basename(aocInput.name(), ".txt")
         const part = path.basename(currentScript(), ".js")
