@@ -31,13 +31,93 @@ export const Sets = {
 }
 
 /**
+ * MATH
+ */
+
+
+/**
+ * @param {number} a
+ * @param {number} b
+ */
+function gcd(a, b) {
+    while(b != 0) {
+        let temp = a % b
+        a = b
+        b = temp
+    }
+    
+    return a
+}
+  
+/**
+ * @param {number} a
+ * @param {number} b
+ */
+function lcm(a, b) {
+    let d = math.gcd(a, b)
+    return a / d * b
+}
+
+export const math = {
+    gcd,
+    lcm
+}
+
+
+/**
+ * ALGOS
+ */ 
+ 
+/**
+ * @template T
+ * @param {(state: T) => T} f
+ * @param {T} initialState
+ * @param {(firstSate: T, secondState: T) => boolean} eqFct
+ */
+function floydCycleDetection(f, initialState, eqFct) {
+    let tortoise = f(initialState)
+    let hare = f(f(initialState))
+  
+    while (!eqFct(tortoise, hare)) {
+        tortoise = f(tortoise)
+        hare = f(f(hare))
+    }
+  
+    let mu = 0
+    tortoise = initialState
+    while(!eqFct(tortoise, hare)) {
+        tortoise = f(tortoise)
+        hare = f(hare)
+        mu++
+    }
+  
+    let lam = 1
+    hare = f(tortoise)
+    while(!eqFct(tortoise, hare)) {
+      hare = f(hare)
+      lam++
+    }
+  
+    return { lam, mu }
+}
+
+export const algos = {
+    floydCycleDetection
+}
+
+/**
+ * OTHER
+ */
+
+
+/**
 * @param {string} str
 */
 export function parseNumberList(str) {
  return str.split(/ +/).map(s => parseInt(s, 10))
 }
 
-class AocInput {
+export class AocInput {
 
     constructor(filepath) {
         this.filepath = filepath
