@@ -1,4 +1,5 @@
-import * as path from 'path';
+import * as path from 'path'
+import * as readline from 'readline'
 import * as fs from 'fs'
 
 export const Sets = {
@@ -220,8 +221,6 @@ export async function run(callback) {
         console.error(ex)
     }
 }
-
-import * as readline from 'readline'
 
 function yesNoQuestion(text) {
     const rl = readline.createInterface({
