@@ -195,7 +195,9 @@ export async function run(callback) {
     try {
         const aocInput = input(inputName)
         console.log("Solving problem with '%s'", aocInput.name())
+        console.time("Time taken")
         const result = await callback(aocInput)
+        console.timeEnd("Time taken")
 
         const prefix = path.basename(aocInput.name(), ".txt")
         const part = path.basename(currentScript(), ".js")
