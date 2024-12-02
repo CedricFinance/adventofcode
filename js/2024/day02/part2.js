@@ -32,20 +32,9 @@ function isSafe2(report) {
 
   return false
 }
-// 685 no
-
 
 aoc.run(async function(input) {
   const reports = input.lines().map(line => line.split(" ").map(part => parseInt(part, 10)))
-  var result = 0
 
-  for (const report of reports) {
-    //console.log(report);
-
-    if (isSafe2(report)) {
-      result++
-    }
-  }
-
-  return result
+  return reports.filter(isSafe2).length
 })
